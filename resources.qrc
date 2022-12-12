@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>shaders/test.vert</file>
+        <file>shaders/test.frag</file>
+        <file>res/flushed.png</file>
+    </qresource>
+</RCC>
