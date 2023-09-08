@@ -6,6 +6,8 @@
 #include <QOpenGLBuffer>
 #include <QMatrix4x4>
 #include <QOpenGLTexture>
+#include <QOpenGLVertexArrayObject>
+
 #include "mesh.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
@@ -49,6 +51,7 @@ private:
 
     Mesh *mesh = nullptr;
     QOpenGLBuffer meshVBO;
+    QOpenGLVertexArrayObject vao;
     bool meshIsReady = false;
     QOpenGLShaderProgram *shaderProgram = nullptr;
     QOpenGLTexture *texture;

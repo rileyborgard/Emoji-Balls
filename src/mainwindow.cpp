@@ -143,8 +143,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     glWidget = new GLWidget(this);
 
-//    mesh = makeDonut(1.f, 2.f, 200, 400, 0.5f, 0.5f, 0.f, 0.5f);
-    mesh = makeSphere(200, 400, 0.5f, 0.5f, 0.5f);
+//    mesh = makeDonut(1.f, 2.f, 100, 200, 0.5f, 0.5f, 0.f, 0.5f);
+    mesh = makeSphere(100, 200, 0.5f, 0.5f, 0.5f);
 
     glWidget->setMesh(mesh);
 

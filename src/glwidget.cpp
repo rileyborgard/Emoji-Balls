@@ -111,8 +111,9 @@ void GLWidget::initializeGL() {
     shaderProgram = new QOpenGLShaderProgram;
     shaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/test.vert");
     shaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/test.frag");
-    shaderProgram->bindAttributeLocation("vertex", 0);
-    shaderProgram->bindAttributeLocation("normal", 1);
+    shaderProgram->bindAttributeLocation("a_vertex", 0);
+    shaderProgram->bindAttributeLocation("a_normal", 1);
+    shaderProgram->bindAttributeLocation("a_uv", 2);
     shaderProgram->link();
 
     shaderProgram->bind();
@@ -153,6 +154,10 @@ void GLWidget::paintGL() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
+    if (!vao.isCreated()) {
+        vao.create();
+    }
+
     world.setToIdentity();
     world.rotate(180.0f - (xrot / 16.0f), 1, 0, 0);
     world.rotate(-yrot / 16.0f, 0, 1, 0);
@@ -167,6 +172,8 @@ void GLWidget::paintGL() {
     if (meshIsReady) {
         meshIsReady = false;
 
+        vao.bind();
+
         // Setup our vertex buffer object.
         meshVBO.create();
         meshVBO.bind();
@@ -174,21 +181,21 @@ void GLWidget::paintGL() {
         meshVBO.release();
 
         setupVertexAttribs();
+
+        vao.release();
     }
 
     if (mesh != nullptr) {
+        vao.bind();
         meshVBO.bind();
         texture->bind();
 
-//        shaderProgram->setUniformValue(colorLoc, 0.75f, 0.75f, 0.75f);
         shaderProgram->setUniformValue(colorLoc, 1.f, 1.f, 1.f);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(1.f, 1.f);
         glDrawArrays(GL_TRIANGLES, 0, mesh->vertexCount());
 
         texture->release();
         meshVBO.release();
+        vao.release();
     }
 
     shaderProgram->release();
@@ -204,8 +211,9 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event) {
-    int dx = event->x() - lastPos.x();
-    int dy = event->y() - lastPos.y();
+    QPoint point = event->pos();
+    int dx = point.x() - lastPos.x();
+    int dy = point.y() - lastPos.y();
 
     if (event->buttons() & Qt::LeftButton) {
         setXRotation(xrot + 8 * dy);
@@ -218,7 +226,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event) {
-    float delta = -event->delta() / 50.f;
+    float delta = -event->angleDelta().y() / 50.f;
     fovAngle += delta;
     fovAngle = std::max(5.f, std::min(150.f, fovAngle));
 
